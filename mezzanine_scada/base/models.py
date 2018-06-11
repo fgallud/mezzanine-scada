@@ -13,13 +13,13 @@ class variable(models.Model):
     description = models.TextField('descripcion', max_length=150,blank=True)
     origin = models.TextField('description of the hardware that generate/measure this variable', max_length=150,blank=True)
     destination = models.TextField('What is this variable for?', max_length=150,blank=True)
-    def __unicode__(self):
+    def __str__(self):
         return '%s:%s:%s' %(self.name,self.name_gui,self.direction)
 
 
 class channel(variable):
     nchannel = models.PositiveIntegerField()
-    def __unicode__(self):
-        return '%i:%s:%s:%i' %(self.nchannel,self.name,self.direction,self.nchannel)
+    def __str__(self):
+        return '%i:%s:%s' %(self.nchannel,self.name,self.direction)
 
 
