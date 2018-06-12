@@ -28,7 +28,7 @@ import threading
 import logging
 import time
 
-class signal_database:
+class variable_database:
     def __init__(self,name='Data Base'):
         self.name=name
         self.data={}
