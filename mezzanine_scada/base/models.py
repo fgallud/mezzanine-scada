@@ -8,6 +8,7 @@ class variable(models.Model):
         ('dummy','is a signal without type'),
     )
     name = models.CharField('unique name of the variable', max_length=150)
+    default_value = models.FloatField()
     direction = models.CharField('direction of the variable',max_length=20,choices=CHANNEL_DIRECTION)
     name_gui = models.CharField('name of the variable user friendly', max_length=150,blank=True)
     description = models.TextField('descripcion', max_length=150,blank=True)
