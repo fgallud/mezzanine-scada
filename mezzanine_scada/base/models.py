@@ -10,6 +10,7 @@ class scada_config(models.Model):
         (logging.INFO, 'INFO'),
         (logging.DEBUG,'DEBUG'),
         (logging.TRACE, 'TRACE'),
+    )
     logging_level = IntegerField('Logging level',default=logging.DEBUG)
     
 class variable(models.Model):
