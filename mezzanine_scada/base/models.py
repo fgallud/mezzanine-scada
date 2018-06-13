@@ -1,6 +1,17 @@
 from django.db import models
+import logging
 
-# Create your models here.
+class scada_config(models.Model):
+    logging_file= models.CharField('path of the logging file',default='../scada.log')
+    LOGGING_LEVELS = (
+        (logging.FATAL, 'FATAL'),
+        (logging.ERROR, 'ERROR'),
+        (logging.WARN, 'WARN'),
+        (logging.INFO, 'INFO'),
+        (logging.DEBUG,'DEBUG'),
+        (logging.TRACE, 'TRACE'),
+    logging_level = IntegerField('Logging level',default=logging.DEBUG)
+    
 class variable(models.Model):
     CHANNEL_DIRECTION = (
         ('input','is a signal that is sampled'),

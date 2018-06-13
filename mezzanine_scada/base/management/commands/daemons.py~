@@ -1,0 +1,114 @@
+# -*- coding: UTF-8 -*-
+from daemon import Daemon
+from threading import Event
+from mezzanine_scada.base.database import variable_database
+from mezzanine_scada.base.models import variable
+from time import time
+
+
+
+"""
+script para generar un servicio al ejecutar con start/stop/restart
+
+
+import logging
+from logging.handlers import SysLogHandler
+import time
+
+from service import find_syslog, Service
+
+class ScadaService(Service):
+    def __init__(self, *args, **kwargs):
+        super(ScadaService, self).__init__(*args, **kwargs)
+        self.logger.addHandler(SysLogHandler(address=find_syslog(),
+                               facility=SysLogHandler.LOG_DAEMON))
+        self.logger.setLevel(logging.INFO)
+        #an event that makes all daemon to stop
+        self.end_event=Event()
+
+    
+    def stop(self):
+        #stop makes end_event true so all threads ends. For more security, sends kill signals 
+        self.end_event.set()
+        self.realtime_db.
+#        return super(ScadaService,self).stop()
+
+    def restart(self):
+        self.end_event.set()
+        time.sleep(10) 
+        self.start()
+        return super(ScadaService,self).restart()
+
+    def run(self):
+        while not self.got_sigterm():
+            self.logger.info("I'm working...")
+            time.sleep(5)
+
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) != 2:
+        sys.exit('Syntax: %s COMMAND' % sys.argv[0])
+
+    cmd = sys.argv[1].lower()
+    service = ScadaService('scada_service', pid_dir='/tmp')
+
+    if cmd == 'start':
+        service.start()
+    elif cmd == 'stop':
+        service.stop()
+    elif cmd == 'restart':
+        service.stop()
+        time.sleep(10.0)
+        service.start()
+    elif cmd == 'status':
+        if service.is_running():
+            print "Service is running."
+        else:
+            print "Service is not running."
+    else:
+        sys.exit('Unknown command "%s".' % cmd)
+
+
+
+
+
+
+#an event that makes all daemon to stop
+end_event=Event()
+
+#realtime database instance
+realtime_db=variable_database(name='Data Base')
+#pre-create all variables
+for var in variable.objects.all():
+    realtime_db.set_value(name=var.name,value=var.default_value,t_aquisition=time())
+
+#one thread for every output variable. This thread waits for a change in the variable and then it sends the new value to the real world
+#for var in variable.objects.filter(direction='output'):
+#    new_thread=output_variable_thread(instrument=output_channels[signal_name]['driver'],
+#                              database=realtime_db,
+#                              name=signal_name,
+#                              nchannel=output_channels[signal_name]['nchannel'],
+#                              end=end_event,
+#                              debug_logger=logger)
+
+
+"""
+hilo_backup=backup_textfile(sensor_names=sensor_names,
+                            sensor_gui_names=sensor_gui_names,
+                            sampling_time=settings.TXTRECORDS_T,
+                            data_path=settings.TXTRECORDS_DIR, 
+                            database=realtime_db,
+                            end=evento_salir,
+                            debug_logger=logger)
+hilo_backup.setName('backup')
+hilo_backup.start()
+lista_hilos.append(hilo_backup)
+"""
+
+
+"""
+a thread for every state machine (controls) available
+
+
+"""
