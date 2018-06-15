@@ -2,16 +2,16 @@ from django.db import models
 import logging
 
 class scada_config(models.Model):
-    logging_file= models.CharField('path of the logging file',default='../scada.log')
+    logging_file= models.CharField('path of the logging file',default='../scada.log',max_length=255)
     LOGGING_LEVELS = (
-        (logging.FATAL, 'FATAL'),
+        (logging.CRITICAL, 'CRITICAL'),
         (logging.ERROR, 'ERROR'),
-        (logging.WARN, 'WARN'),
+        (logging.WARNING, 'WARNING'),
         (logging.INFO, 'INFO'),
         (logging.DEBUG,'DEBUG'),
-        (logging.TRACE, 'TRACE'),
+        (logging.NOTSET, 'NOTSET'),
     )
-    logging_level = IntegerField('Logging level',default=logging.DEBUG)
+    logging_level = models.DecimalField('Logging level',default=logging.ERROR, max_digits=2, decimal_places=0,choices=LOGGING_LEVELS)
     
 class variable(models.Model):
     CHANNEL_DIRECTION = (

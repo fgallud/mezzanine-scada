@@ -1,69 +1,11 @@
 # -*- coding: UTF-8 -*-
-from daemon import Daemon
 from threading import Event
 from mezzanine_scada.base.database import variable_database
 from mezzanine_scada.base.models import variable, scada_config
 from time import time, sleep
-
-
-
-
-
-#script para generar un servicio al ejecutar con start/stop/restart
-
-
 import logging
 from logging.handlers import SysLogHandler
-
-
 from service import find_syslog, Service
-
-#this should be in the django database
-LOGGER_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        },
-        'short': {
-            'format': '%(asctime)s:%(message)s'
-        },
-    },
-    'handlers': {
-        'default': {
-            'level':'INFO',
-            'class':'logging.StreamHandler',
-        },
-        'fileHandler': {
-            'level':'ERROR',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/home/paco/eclipse/python/EDSolar/scada/scada/logs/log_scada.log',
-            'mode':'a',
-            'maxBytes': 10485760,
-            'backupCount': 500,
-            'formatter':'standard',
-        },
-        'consoleHandler': {
-            'level':'ERROR',
-            'class':'logging.StreamHandler',
-            'formatter':'short',
-        },
-    },
-    'loggers': {
-        'simple_scada': {
-            'handlers': ['fileHandler','consoleHandler'],
-            'level': 'ERROR',
-            'propagate': False
-        },
-    }
-}
-
-TXTRECORDS_DIR='/home/paco/eclipse/python/EDSolar/scada/scada/data'
-TXTRECORDS_T=10.0
-
-
-
 
 class ScadaService(Service):
     def __init__(self, *args, **kwargs):
