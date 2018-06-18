@@ -1,30 +1,69 @@
 # -*- coding: UTF-8 -*-
-from threading import Event
+from threading import Event, Thread
 from mezzanine_scada.base.database import variable_database
 from mezzanine_scada.base.models import variable, scada_config
 from time import time, sleep
 import logging
-from logging.handlers import SysLogHandler
-from service import find_syslog, Service
+from django.core.management.base import BaseCommand
+from ssl import SSLContext
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.client import ServerProxy
+from secrets import token_hex
 
-class ScadaService(Service):
-    def __init__(self, *args, **kwargs):
-        super(ScadaService, self).__init__(*args, **kwargs)
-        settings=scada_config.objects.first()
-        file_handler = logging.FileHandler(settings.logging_file)
-        file_handler.setLevel(settings.logging_level)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
+import sys
+import time
+
+import daemon
+
+
+
+
+
+class ScadaDaemon:
+    def __init__(self):
+        self.settings=scada_config.objects.first()
+        logging.basicConfig(level=self.settings.logging_level,
+                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                            filename=self.settings.logging_file,
+                            filemode='w')
+        self.logger=logging 
+    
+    def shutdown_daemon(self, password):
+        #this is the stop routine running in the daemon context
+        #end all threads
+        if password==self.server_pasword:
+            self.end_event.set()
+            for thread_name in self.thread_list:
+                try:
+                    self.thread_list[thread_name].join(10.0)
+                    print(thread_name+" ended")
+                except:
+                    message="ERROR: "thread_name+" can't exit"
+                    print(message)
+                    self.logger.error(message)
+            self.logger.error("saliendo del servidor xmlrpc") 
+            #falta terminar el servidor xmlrpc
+    
+    def add(self,x,y):
+        return x+y
     
     def stop(self):
-        #stop makes end_event true so all threads ends. For more security, sends kill signals 
-        self.end_event.set()
-        self.realtime_db.set_all_events()
-        sleep(10)
-        return super(ScadaService,self).stop()
-
+        #conect with the server and end the daemon
+        try:
+            proxy=ServerProxy('https://localhost:%i/' %self.settings.server_port)
+            proxy.shutdown_daemon(self.server_password)
+        except:
+            message="DAEMON can't stop"
+            print(message)
+            self.logger.error(message)
+    
     def start(self):
+        #the password is one use only
+        self.settings.password=token_hex(16)
+        self.settings.save()
+        #create all instances and run all threads
+        #a dictionary of threads that are executing
+        thread_list={}
         #this event ends the daemon
         self.end_event=Event()
         #realtime database instance
@@ -32,93 +71,36 @@ class ScadaService(Service):
         #pre-create all variables
         for var in variable.objects.all():
             self.realtime_db.set_value(name=var.name,value=var.default_value,t_aquisition=time())
-#si se carga la app backup, crear un hilo de su tipo
-#        self.backup_thread=backup_textfile(variable_names=variable_names,
-#                                           sensor_gui_names=sensor_gui_names,
-#                                           sampling_time=settings.TXTRECORDS_T,
-#                                           data_path=settings.TXTRECORDS_DIR, 
-#                                           database=self.realtime_db,
-#                                           end=self.end_event,
-#                                           debug_logger=self.logger)
-#        self.hilo_backup.setName('backup')
-#hilo_backup.start()
-#lista_hilos.append(hilo_backup)
-#
-#Every app in django, if is an instrument then load the thread/threads for every instruent 
-#for every output variable, add a thread that wait for a change in the database and then send the new value to the real world
-#if the state machine app is loaded, for every control state machine add a thread 
-        return super(ScadaService,self).start()
+        #execute all threads needed
+        #thread for saving variable values to files
+        #hardware related threads
+        #one thread for each output variable
+        #one thread for each input type of hardware
+        #control related threads
+        #a xmlrpc server to be able to access methods from outside this process
+        context = SSLContext()
+        self.server = SimpleXMLRPCServer(("https://localhost", SERVER_PORT),context=context)
+        self.server.register_function(shutdown_daemon, "shutdown_daemon")
+        self.server.register_function(add, "add")
+        #serve_forever waits forever, only the call to the inherited shutdown method from another thread can stop it
+        self.server.serve_forever()
+
+
+class Command(BaseCommand):
+    help = 'command that load all threads in mezzanine-scada'
+    def add_arguments(self, parser):
+        parser.add_argument('action', choices=['start', 'stop'], nargs='+', type=str)
+    def handle(self, *args, **options):
+        #service instance
+        scada = ScadaDaemon()
+        if 'start' == options['action'][0]:
+            with daemon.DaemonContext():
+                scada.start()
+        elif 'stop' == options['action'][0]:
+            scada.stop()
+ 
+
+
+
     
-    def restart(self):
-        self.stop()
-        self.start()
-    
-    def run(self):
-        while not self.got_sigterm():
-            self.logger.info("I'm working...")
-            sleep(5)
-
-if __name__ == '__main__':
-    import sys
-
-    if len(sys.argv) != 2:
-        sys.exit('Syntax: %s COMMAND' % sys.argv[0])
-
-    cmd = sys.argv[1].lower()
-    service = ScadaService('scada_service', pid_dir='/tmp')
-
-    if cmd == 'start':
-        service.start()
-    elif cmd == 'stop':
-        service.stop()
-    elif cmd == 'restart':
-        service.stop()
-        sleep(10.0)
-        service.start()
-    elif cmd == 'status':
-        if service.is_running():
-            print "Service is running."
-        else:
-            print "Service is not running."
-    else:
-        sys.exit('Unknown command "%s".' % cmd)
-
-
-
-
-"""
-#an event that makes all daemon to stop
-end_event=Event()
-
-#realtime database instance
-realtime_db=variable_database(name='Data Base')
-#pre-create all variables
-for var in variable.objects.all():
-    realtime_db.set_value(name=var.name,value=var.default_value,t_aquisition=time())
-
-#one thread for every output variable. This thread waits for a change in the variable and then it sends the new value to the real world
-#for var in variable.objects.filter(direction='output'):
-#    new_thread=output_variable_thread(instrument=output_channels[signal_name]['driver'],
-#                              database=realtime_db,
-#                              name=signal_name,
-#                              nchannel=output_channels[signal_name]['nchannel'],
-#                              end=end_event,
-#                              debug_logger=logger)
-#
-#hilo_backup=backup_textfile(sensor_names=sensor_names,
-#                            sensor_gui_names=sensor_gui_names,
-#                            sampling_time=settings.TXTRECORDS_T,
-#                            data_path=settings.TXTRECORDS_DIR, 
-#                            database=realtime_db,
-#                            end=evento_salir,
-#                            debug_logger=logger)
-#hilo_backup.setName('backup')
-#hilo_backup.start()
-#lista_hilos.append(hilo_backup)
-
-#a thread for every state machine (controls) available
-#
-#
-#
-"""
 

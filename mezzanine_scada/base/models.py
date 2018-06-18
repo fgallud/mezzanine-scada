@@ -11,7 +11,11 @@ class scada_config(models.Model):
         (logging.DEBUG,'DEBUG'),
         (logging.NOTSET, 'NOTSET'),
     )
-    logging_level = models.DecimalField('Logging level',default=logging.ERROR, max_digits=2, decimal_places=0,choices=LOGGING_LEVELS)
+    logging_level = models.PositiveSmallIntegerField('Logging level',default=logging.ERROR,choices=LOGGING_LEVELS)
+    server_port = models.PositiveSmallIntegerField('scada daemon server port',default=8888)
+    server_password = CharField('password needed to end de scada daemon',default='ca93107ec58ddcb984eb210bad726925',editable=False)
+    def __str__(self):
+        return 'Scada configuration'
     
 class variable(models.Model):
     CHANNEL_DIRECTION = (
