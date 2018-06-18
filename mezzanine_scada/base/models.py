@@ -13,7 +13,7 @@ class scada_config(models.Model):
     )
     logging_level = models.PositiveSmallIntegerField('Logging level',default=logging.ERROR,choices=LOGGING_LEVELS)
     server_port = models.PositiveSmallIntegerField('scada daemon server port',default=8888)
-    server_password = CharField('password needed to end de scada daemon',default='ca93107ec58ddcb984eb210bad726925',editable=False)
+    server_password = models.CharField('password needed to end de scada daemon',default='ca93107ec58ddcb984eb210bad726925',editable=False,max_length=128)
     def __str__(self):
         return 'Scada configuration'
     
