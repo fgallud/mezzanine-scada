@@ -1,0 +1,100 @@
+# -*- coding: UTF-8 -*-
+"""
+This app adds some fake instruments that can be used to have variables with a value that changes every some time with values:
+
+aco@PacoPC:/usr/local/lib/python3.6/dist-packages/mezzanine_scada/hardware/simulated$ ls simulationclasses/
+constantsimulation.py   constantsimulation.pyc  __init__.py~  sinusoidalsimulation.py   uniformsimulation.py
+constantsimulation.py~  __init__.py             __init__.pyc  sinusoidalsimulation.py~  uniformsimulation.py~
+
+
+
+- constant
+  add a simulated_variable whith:
+      - simulated_class: mezzanine_scada.hardware.simulated.simulationclasses.constantsimulation
+      - simulated_class_kwargs:  {'value': constant_value }
+- random
+- sinusoidal
+- integral
+- other simulated variable user defined need to program a custom class with a get_value method for getting the value
+
+
+"""
+
+import threading
+import time
+import os
+import logging
+from .models import *
+from importlib import import_module
+import json
+import re
+
+def load_dirty_json(dirty_json):
+    regex_replace = [(r"([ \{,:\[])(u)?'([^']+)'", r'\1"\3"'), (r" False([, \}\]])", r' false\1'), (r" True([, \}\]])", r' true\1')]
+    for r, s in regex_replace:
+        dirty_json = re.sub(r, s, dirty_json)
+    clean_json = json.loads(dirty_json)
+    return clean_json
+
+
+
+
+class simulated_variable_thread(threading.Thread):
+    def __init__(self,
+                 name='',
+                 database=None,
+                 end=threading.Event(),
+                 debug_logger=logging,
+                 sampling_time=10.0,
+                 simulation_instance=None):       
+        threading.Thread.__init__(self)  
+        self.name=name
+        self.logger=debug_logger
+        self.database=database
+        self.end=end
+        self.sampling_time=sampling_time
+        self.simulation_instance=simulation_instance
+    def run(self):
+        while not self.end.isSet():
+            value=self.simulation_instance.get_value()
+            self.database.set_value(name=self.name,value=value,t_aquisition=time.time())
+            print('name= %s, value=%f' %(self.name,value))
+            self.end.wait(self.sampling_time)
+
+
+
+class scadathread(threading.Thread):
+    def __init__(self,
+                 database=None,
+                 end=threading.Event(),
+                 debug_logger=logging):       
+        threading.Thread.__init__(self)  
+        self.logger=debug_logger
+        self.database=database
+        self.end=end
+        self.thread_list={}
+        for var in simulated_variable.objects.all():
+            try:
+                simulation_lib=import_module(var.simulation_class)
+                try:
+                    simulation_kwargs=json.loads(var.simulation_class_kwargs)
+                except:
+                    self.logger.error('SCADATHREAD: Error loading json arguments in variable: '+var.name)
+                    continue
+                simulation_kwargs['database']=self.database
+                simulation_kwargs['debug_logger']=self.logger
+                simulation_instance = simulation_lib.simulationclass(**simulation_kwargs)
+                self.thread_list[var.name]=simulated_variable_thread(name=var.name,
+                                                                     database=self.database,
+                                                                     end=self.end,
+                                                                     debug_logger=self.logger,
+                                                                     sampling_time=var.sampling_time,
+                                                                     simulation_instance=simulation_instance)
+            except:
+                self.logger.error('SCADATHREAD: Error loading simulated variable: %s' %var.name)
+                continue
+    def run(self):
+        for thread_name in self.thread_list:
+            self.thread_list[thread_name].start()
+        for thread_name in self.thread_list:
+            self.thread_list[thread_name].join()

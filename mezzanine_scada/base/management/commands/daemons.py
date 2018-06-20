@@ -10,9 +10,10 @@ from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 from xmlrpc.client import ServerProxy
 
 from secrets import token_hex
-from threading import Event, Thread
+import threading 
 import daemon
-
+from django.conf import settings
+from importlib import import_module
 
 
 
@@ -27,6 +28,29 @@ def remote_shutdown():
     return 'Returned from remote_shutdown'
 
 
+
+class xmlrpcserver_killer(threading.Thread):  
+    def __init__(self, server=None,debug_logger=logging):  
+        threading.Thread.__init__(self)  
+        self.server=server
+        self.logger=debug_logger
+    def shutdown_daemon(self):
+        self.start()
+        return 'done'
+    def run(self):
+        #We want to end the serve_forever method in the server class. The proper method to do this is calling the shutdown method from another thread
+        #the user python3 manage.py daemons stop command call the start method of this class by a xmlrpc call. This method just calls the shutdown method 
+        #of the server
+        try:
+            self.server.shutdown()
+            self.logger.info('XMLRPC Server shut down')
+        except:
+            self.logger.error('Error shutting down the XMLRPC Server')
+
+
+
+
+
 class ScadaDaemon:
     def __init__(self):
         self.settings=scada_config.objects.first()
@@ -35,33 +59,12 @@ class ScadaDaemon:
                             filename=self.settings.logging_file,
                             filemode='w')
         self.logger=logging 
-    
-    def shutdown_daemon(self, password):
-        #this is the stop routine running in the daemon context
-        #end all threads
-        print("tirando abajo el demonio")
-        if password==self.server_pasword:
-            print(1)
-            self.end_event.set()
-            print(2)
-            for thread_name in self.thread_list:
-                try:
-                    print(3)
-                    self.thread_list[thread_name].join(10.0)
-                    print(thread_name+" ended")
-                except:
-                    message="ERROR: "+thread_name+" can't exit"
-                    print(message)
-                    self.logger.error(message)
-            self.logger.error("saliendo del servidor xmlrpc") 
-            #falta terminar el servidor xmlrpc
-    
     def stop(self):
         #conect with the server and end the daemon
         try:
             #it should use https if this is going to be on the internet
             proxy = ServerProxy('http://localhost:%i' %self.settings.server_port)
-            proxy.remote_shutdown()#shutdown_daemon(self.server_password)
+            proxy.shutdown_daemon()
         except:
             message="DAEMON can't stop"
             print(message)
@@ -73,9 +76,9 @@ class ScadaDaemon:
         self.settings.save()
         #create all instances and run all threads
         #a dictionary of threads that are executing
-        thread_list={}
+        self.thread_list={}
         #this event ends the daemon
-        self.end_event=Event()
+        self.end_event=threading.Event()
         #realtime database instance
         self.realtime_db=variable_database(name='Data Base')
         #pre-create all variables
@@ -94,10 +97,34 @@ class ScadaDaemon:
         self.server.register_introspection_functions()
 #        self.server.register_function(self.shutdown_daemon, "shutdown_daemon")
         self.server.register_function(pow, "pow")
-        self.server.register_function(remote_shutdown, "remote_shutdown")
+#        self.server.register_function(remote_shutdown, "remote_shutdown")
         #serve_forever waits forever, only the call to the inherited shutdown method from another thread can stop it
+#        self.server.register_instance(self.shutdown_daemon,"shutdown_daemon")
+        self.thread_list['server killer']=xmlrpcserver_killer(server=self.server,debug_logger=self.logger)
+        self.server.register_function(self.thread_list['server killer'].shutdown_daemon,"shutdown_daemon")
+        #run a thread for each app that has a scadathread file with a scadathread class in it
+        for app in settings.INSTALLED_APPS:
+            if app == 'mezzanine_scada.base':
+                continue
+            if 'mezzanine_scada.' in app:
+                try:
+                    app_complete_path=app+'.scadathread'
+                    print(app_complete_path)
+                    app_thread=import_module(app_complete_path).scadathread
+                    self.thread_list[app]=app_thread(database=self.realtime_db,
+                                                     end=self.end_event,
+                                                     debug_logger=self.logger)
+                    self.thread_list[app].start()
+                    print(app+' thread loaded')
+                except:
+                    self.logger.debug('APP %s cant load scadathread' %app)
         self.server.serve_forever()
-
+        #the service is shutting down, wait for all threads to end
+        self.end_event.set()
+        for thread_name in self.thread_list:
+            self.thread_list[thread_name].join()
+            self.logger.info('Thread %s ended' %thread_name)            
+            print('Thread %s ended' %thread_name)
 
 
 class Command(BaseCommand):
