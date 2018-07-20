@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block main %}
+
+{% load static %}
+
+
+<div class="container">
+  <object class="scada_svg" data= "{% static "img/schematic.svg" %}" type="image/svg+xml" width="100%">
+    <!--  <img src="yourfallback.jpg" />-->
+  </object>
+</div>
+
+{% endblock %}

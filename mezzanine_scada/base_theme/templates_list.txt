@@ -1,0 +1,3 @@
+change Home to Schematic in the menu                        templates/pages/menus/dropdown.html
+only a full width svg in static/img/schematic.svg           templates/index.html
+delete the footer, lateral menu, load custom js             templates/base.html 

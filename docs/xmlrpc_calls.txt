@@ -1,0 +1,25 @@
+There are two servers in the system:
+
+- The django/mezzanine server that is a thread that gets a request, delivers
+  a response and then it die
+
+- The scada service loaded with python3 manage.py daemons start
+  This is a thread that is alive all the time and accepts request with
+  xmlrpc to: kill itself, access some data from the realtime database,
+  accept commands for the state machine controls, ...
+
+- If the client web page has to access the django database it has to do a
+  ajax call to django. For instance, it happens if the client needs a user
+  friendly name for a variable.
+
+- If the client web page has to access to the service to access realtime
+  values, send a message to a state machine control... must do an ajax call
+  to django and then django make a xmlrpc access to the service xmlrpc server.
+  It's a little ugly solution but accessing directly the xmlrpc server on the 
+  service is worst. It needs to add a security exection to the
+  web navigator security system and it's a security nightmare. If all the 
+  communications with the client are handle with
+  django, to secure the app you only need to use https in the web server and
+  do all the ajax calls to views that needs to be secured with the @login_required
+  decorator.
+

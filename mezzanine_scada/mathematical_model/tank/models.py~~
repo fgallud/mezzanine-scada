@@ -1,0 +1,15 @@
+from django.db import models
+from mezzanine_scada.base.models import variable
+
+
+
+class tank(models.Model):
+  name = models.CharField('Name of the tank')
+  maximum_volume = models.FloatField() #maximum volume allowed
+  initial_volume = models.FloatField() #volume at the begining
+  volume = models.ForeignField(variable)
+  input_flow = models.ForeignField(variable)
+  output_flow = models.ForeignField(variable)
+  loop_time = models.FloatField()
+
+

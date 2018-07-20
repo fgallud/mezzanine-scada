@@ -1,0 +1,63 @@
+
+from threading import Thread, Event
+from time import time
+from math import isnan
+import logging
+
+#thread that simulates a real world tank
+class tank_simulator(Thread):
+#This class simulates the behavior of a tank filled of water or other liquid/gas
+#It has an input that allows a constant flow of fluid in
+#and an output that allows a constant flow of fluid out.
+      def __init__(self, 
+                   database=None,
+                   end=None,
+                   logger=logging,
+                   tank_maximum_volume=1000.0,
+                   tank_volume_name='my_current_volume_name', 
+                   tank_initial_volume=0.0,
+                   input_flow_name='my_input_flow_variable',
+                   output_flow='my_output_flow_variable',
+                   loop_time=1.0):  
+          Thread.__init__(self)
+          self.database=database
+          self.end=end
+          self.logger=logger
+          self.tank_volume_name=tank_volume_name
+          self.database.set_value(name=self.tank_volume_name,value=tank_initial_volume)
+          self.input_flow_name=input_flow_name
+          self.output_flow_name=output_flow_name
+          self.loop_time=loop_time
+      
+      def run(self):
+          current_time=time()
+          current_volume = self.database.get_value(name=self.tank_volume_name)['value']
+          input_flow=self.database.get_value(name=self.input_flow_name)['value']
+          output_flow=self.database.get_value(name=self.output_flow_name)['value']
+          while not self.end.isSet():
+              last_volume      = current_volume
+              last_input_flow  = input_flow
+              last_output_flow = output_flow
+              input_flow=self.database.get_value(name=self.input_flow_name)['value']
+              output_flow=self.database.get_value(name=self.output_flow_name)['value']
+              if ( isnan(last_volume) or
+                   isnan(last_input_flow) or
+                   isnan(last_output_flow) or
+                   isnan(input_flow) or
+                   isnan(output_flow)):
+                  self.logger.error('The volume/flow is not a number')
+                  continue
+              last_time = current_time
+              current_time=current_time+self.loop_time
+              current_volume=(current_time-last_time)*0.5*(last_input_flow-last_output_flow+input_flow-output_flow)
+              self.database.set_value(name=self.tank_volume_name,value=current_volume)
+              wait_time=current_time+self.loop_time-time()
+              if (wait_time>0.0):
+                  self.end.wait(wait_time)
+
+
+
+
+
+
+

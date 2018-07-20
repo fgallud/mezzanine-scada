@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+import pyscada
+
+__version__ = pyscada.__version__
+__author__ = 'Francisco Gallud Martinez'
+
+default_app_config = 'pyscada.simulated.apps.PyScadaSimulatedConfig'
+
+PROTOCOL_ID = 15
+
+parent_process_list = [{'pk': PROTOCOL_ID,
+                        'label': 'pyscada.simulated',
+                        'process_class': 'pyscada.simulated.worker.Process',
+                        'process_class_kwargs': '{"dt_set":1000}',
+                        'enabled': True}]
+
+
+

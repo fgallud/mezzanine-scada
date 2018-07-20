@@ -1,0 +1,31 @@
+based on http://bitofpixels.com/blog/mezzatheming-creating-mezzanine-themes-part-1-basehtml/
+
+
+the theme is in the base_theme directory in the repository. This is a how do I
+did it. It is only useful to know how to modify the theme and to know how it works
+
+
+python3 manage.py startapp base_theme
+
+move the base_theme to the mezzanine_scada directory
+
+in settings.py add the app 
+
+"mezzanine_scada.base_theme",  must be the first app, before django load the
+base theme.
+
+
+mkdir /.../mezzanine_scada/base_theme/static
+
+python3 manage.py collecttemplates -t base.html
+mv templates/ /.../mezzanine_scada/base_theme
+
+and then I copy and modify each file from html5-boilerplate web template
+(currently v6.1.0) to the app template directory modifying the code to use
+the django templates variables
+
+
+
+
+
+

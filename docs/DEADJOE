@@ -1,0 +1,37 @@
+
+*** These modified files were found in JOE when it aborted on Wed Jun 27 15:29:34 2018
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+state
+state_function
+Foreign
+name
+start
+realtime
+deposito_llenado
+path
+contrib
+bon
+
+*** File '(Unnamed)'
+pump.svg
+* Build Log *
+pump.svg
+svg.txt
+svg.txt
+/home/paco/proyectos/mezzanine-scada/scada_ejemplo/myscada/static/media/schematic/drawing.svg
+svg.txt
+svg.txt
+svg.txt
+base.html
+mezzanine_theme.txt
+mezzanine_theme.txt
+mezzanine_theme.txt
+mezzanine_theme.txt
+
+*** File '* Startup Log *'
+Processing '/etc/joe/joerc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/joerc

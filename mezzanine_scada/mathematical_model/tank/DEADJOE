@@ -1,0 +1,48 @@
+
+*** These modified files were found in JOE when it aborted on Tue Jul 10 14:07:37 2018
+*** JOE was aborted because the terminal closed
+
+*** File 'models.py'
+from django.db import models
+from mezzanine_scada.base.models import variable
+
+
+
+class tank(models.Model):
+  name = models.CharField('Name of the tank',max_length=255)
+  maximum_volume = models.FloatField() #maximum volume allowed
+  initial_volume = models.FloatField() #volume at the begining
+  volume = models.ForeignField(variable)
+  input_flow = models.ForeignField(variable)
+  output_flow = models.ForeignField(variable)
+  loop_time = models.FloatField()
+*** File '(Unnamed)'
+realtime
+database
+APP
+self.server
+server
+xml
+xml
+xml
+server
+end
+
+*** File '(Unnamed)'
+models.py
+models.py
+tank.py
+models.py
+models.py
+models.py
+../../base/models.py
+models.py
+models.py
+../../base/models.py
+models.py
+
+*** File '* Startup Log *'
+Processing '/etc/joe/joerc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/joerc

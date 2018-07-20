@@ -1,0 +1,17 @@
+from random import uniform
+import logging
+
+logger = logging.getLogger(__name__)
+
+class simulationclass:
+    def __init__(self,**kwargs):
+        if 'value' in kwargs:
+            self.value=kwargs['value']
+        else:
+            self.value=0.0
+    
+    def get_value(self):
+    #if the value is totally constant, RecordedData is not created (the database detects that it hasn't changed)
+    #so the variablemonitor app don't wake up the threads that are waiting for changes 
+        return self.value+uniform(0.0,1e-10)  
+

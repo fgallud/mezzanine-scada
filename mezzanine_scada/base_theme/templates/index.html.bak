@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block meta_title %}{% trans "Schematic" %}{% endblock %}
+
+{% block title %}{% trans "Schematic" %}{% endblock %}
+
+{% block breadcrumb_menu %}
+<li class="active">{% trans "Schematic" %}</li>
+{% endblock %}
+
+
+{% block main %}
+
+{% load static %}
+<object data= "{% static "img/schematic.svg" %}" type="image/svg+xml">
+<!--  <img src="yourfallback.jpg" />-->
+</object>
+
+
+{% endblock %}

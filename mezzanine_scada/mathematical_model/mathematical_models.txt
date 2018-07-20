@@ -1,0 +1,5 @@
+SCADA software usually needs to deal with real systems that can be costly, 
+dangerous and/or slow to manipulate. It's usually better to control a simulated
+system until the SCADA system is mature enough to go to the real world.
+
+

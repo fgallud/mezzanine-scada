@@ -1,0 +1,67 @@
+from django.db import models
+
+"""
+- a state machine is a array of states
+- each state is:
+    - state function
+    - a init function
+    - an end function
+    - an array of transition conditions and functions
+
+
+TODO list:
+  - add alarms. The idea is to have a list of alarms set to tackle problems that can happen
+  - an alarm is a function that returns a boolean that is true if the alarm is happening
+  - each state machine have some alarms active througout the entire state machine and some
+    that are only active on one state (or a few of them)
+"""    
+    
+
+class function(models.Model):
+    name = models.CharField('Name of the function', max_length=150)
+    function_path = models.CharField('location of the function', max_length=300,default='.myapp.my_state_machine.my_library.my_function')
+    description = models.TextField('descripcion', max_length=150,blank=True)
+    def __str__(self):
+        return '%s' %self.name
+
+class alarm_condition(function):
+#is a normal function but i don't want django admin to show all functions
+#so  i need to change something 
+    def __str__(self):
+        return '%s alarm condition' 
+
+class alarm_action(function):
+    def __str__(self):
+        return '%s alarm action'
+
+class alarm(models.Model):
+    condition = models.ForeignKey(alarm_condition)
+    action = models.ForeignKey(alarm_action)
+#    variable = models.ForeignKey(variable)
+#    minimum = models.FloatKey('Minimum value allowed')
+#    maximum = models.FloatKey('Maximum value allowed')
+
+
+class state(models.Model):
+    name = models.CharField('Name of the function', max_length=150)
+    alarms = models.ManyToManyField(alarm)
+
+class state_function(function):
+    state = models.ForeignKey(state)
+
+class init_function(function):
+    state = models.ForeignKey(state)
+
+class transition_condition_function(function):
+    origin_state =  models.ForeignKey(state,     related_name='origin_state')
+    destination_state = models.ForeignKey(state, related_name='destination_state')
+
+
+class transition_action_function(function):
+    origin_state =  models.ForeignKey(state,     related_name='origin_state')
+    destination_state = models.ForeignKey(state, related_name='destination_state')
+"""
+class state_machine(models.Model):
+    states = models.ManyToManyField(state)
+
+"""

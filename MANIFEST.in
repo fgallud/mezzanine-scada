@@ -1,0 +1,13 @@
+include README.rst
+include README.md
+include LICENSE
+include setup.py
+
+docs/readme.txt
+mezzanine_scada/__init__.py
+mezzanine_scada/base/admin.py
+mezzanine_scada/base/apps.py
+mezzanine_scada/base/database.py
+mezzanine_scada/base/models.py
+mezzanine_scada/base/tests.py
+mezzanine_scada/base/views.py
