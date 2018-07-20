@@ -9,7 +9,7 @@ Detailed documentation is in the "docs" directory.
 
 Install:
 
-pip3 install git+https://github.com/fgallud/mezzanine-scada.git
+sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 Execute the example site:
 
@@ -19,8 +19,9 @@ or the path your system installs python3 packages in
 
 cd example_projects/tank
 
-python3 manage.py daemons start &
-python3 manage.py runserer
+sudo python3 manage.py daemons start &
+
+sudo python3 manage.py runserer
 
 and now you can see the example on your browser (I use mozzilla Firefox) on http://127.0.0.1:8000
 
