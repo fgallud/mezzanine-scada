@@ -25,6 +25,8 @@ sudo python3 manage.py runserer
 
 and now you can see the example on your browser (I use mozzilla Firefox) on http://127.0.0.1:8000
 
+the user is admin and the password is admin
+
 Bear in mind that in the current state is useless
 
 
