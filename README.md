@@ -15,7 +15,7 @@ Execute the example site:
 
 cd /usr/local/lib/python3.6/dist-packages/mezzanine_scada
 
-or the path your system installs python3 packages
+or the path your system installs python3 packages in
 
 cd example_projects/tank
 
