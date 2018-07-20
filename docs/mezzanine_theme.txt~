@@ -1,0 +1,5 @@
+based on http://bitofpixels.com/blog/mezzatheming-creating-mezzanine-themes-part-1-basehtml/
+
+
+python3 manage.py startapp mezzanine_scada_theme
+mkdir mezzanine_scada_theme/static
