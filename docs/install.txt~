@@ -1,0 +1,11 @@
+Esta carpeta es una aplicacion mezzanine con las apps de scada instaladas
+
+mezzanine-project myscada
+cd myscada
+joe myscada/settings.py
+añadir las aplicaciones:
+
+  'mezzanine_scada.base',
+rm dev.db
+python3 manage.py createdb
+python3 manage.py runserver

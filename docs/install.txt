@@ -1,0 +1,3 @@
+
+sudo pip3 git+https://github.com/fgallud/mezzanine-scada.git
+

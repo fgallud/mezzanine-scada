@@ -86,7 +86,6 @@ class ScadaDaemon:
         #pre-create all variables
         for var in variable.objects.all():
             self.realtime_db.set_value(name=var.name,value=var.default_value,t_aquisition=time.time())
-        print(self.realtime_db.set_value('tank_current_value',3.1415926))
         #execute all threads needed
         #thread for saving variable values to files
         #hardware related threads
