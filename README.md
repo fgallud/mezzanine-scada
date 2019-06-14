@@ -9,21 +9,27 @@ Detailed documentation is in the "docs" directory.
 
 Install:
 
+Linux:
 sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
+Windows : 
+pip3 install git+https://github.com/fgallud/mezzanine-scada.git
+
+clone this project:
+git clone https://github.com/fgallud/mezzanine-scada
 
 Execute the example site:
 Linux:
-cd /usr/local/lib/python3.6/dist-packages/mezzanine_scada
+cd mezzanine-scada/mezzanine_scada/example_projects/tank
 Windows:
-cd C:\python3_path\Lib\site-packages\mezzanine_scada
+cd mezzanine-scada\mezzanine_scada\example_projects\tank
 
-or the path your system installs python3 packages in
-
-cd example_projects/tank
-
+Linux:
 sudo python3 manage.py daemons start &
+sudo python3 manage.py runserver
+Windows:
+python3 manage.py daemons start &
+python3 manage.py runserver
 
-sudo python3 manage.py runserer
 
 and now you can see the example on your browser (I use mozzilla Firefox) on http://127.0.0.1:8000
 
