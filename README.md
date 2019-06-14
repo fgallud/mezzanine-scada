@@ -12,8 +12,10 @@ Install:
 sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 Execute the example site:
-
+Linux:
 cd /usr/local/lib/python3.6/dist-packages/mezzanine_scada
+Windows:
+cd C:\python3_path\Lib\site-packages\mezzanine_scada
 
 or the path your system installs python3 packages in
 
