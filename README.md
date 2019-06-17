@@ -11,18 +11,27 @@ Install:
 
 Linux:
 
-sudo pip3 install mezzanine
+sudo pip3 install mezzanine daemon
 
-sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
-
-Windows :
-
-pip3 install mezzanine
-
-pip3 install git+https://github.com/fgallud/mezzanine-scada.git
+# i don't know why but this install an old version
+#sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 clone this project:
 git clone https://github.com/fgallud/mezzanine-scada
+copy mezzanine_scada folder to the python path \Lib\site-packages folder (at least until the pip installation method works)
+
+
+
+Windows :
+
+pip3 install mezzanine daemon
+
+# i don't know why but this installs an old version
+#pip3 install git+https://github.com/fgallud/mezzanine-scada.git
+
+clone this project:
+git clone https://github.com/fgallud/mezzanine-scada
+copy mezzanine_scada folder to the python path \Lib\site-packages folder (at least until the pip installation method works)
 
 Execute the example site:
 Linux:
