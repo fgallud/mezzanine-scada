@@ -13,7 +13,7 @@ Linux:
 
 sudo pip3 install mezzanine daemon
 
-# i don't know why but this install an old version
+#I don't know why but this install an old version
 #sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 clone this project:
@@ -26,7 +26,7 @@ Windows :
 
 pip3 install mezzanine daemon
 
-# i don't know why but this installs an old version
+#I don't know why but this installs an old version
 #pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 clone this project:
