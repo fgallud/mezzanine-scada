@@ -10,7 +10,9 @@ Detailed documentation is in the "docs" directory.
 Install:
 
 Linux:
+
 sudo pip3 install mezzanine
+
 sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 
 Windows :
