@@ -13,7 +13,7 @@ Linux:
 sudo pip3 install mezzanine
 sudo pip3 install git+https://github.com/fgallud/mezzanine-scada.git
 Windows :
-pip3 install git+git://github.com/fgallud/mezzanine-scada/master
+pip3 install git+git://github.com/fgallud/mezzanine-scada.git
 
 
 pip3 install mezzanine
