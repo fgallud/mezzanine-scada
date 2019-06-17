@@ -26,14 +26,18 @@ git clone https://github.com/fgallud/mezzanine-scada
 
 Execute the example site:
 Linux:
+
 cd mezzanine-scada/mezzanine_scada/example_projects/tank
 Windows:
+
 cd mezzanine-scada\mezzanine_scada\example_projects\tank
 
 Linux:
+
 sudo python3 manage.py daemons start &
 sudo python3 manage.py runserver
 Windows:
+
 python3 manage.py daemons start &
 python3 manage.py runserver
 
